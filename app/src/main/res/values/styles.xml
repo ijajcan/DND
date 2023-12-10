@@ -15,5 +15,10 @@
         <item name="android:textColor">#01161E</item>
     </style>
 
-
+    <style name="timePicker">
+        <item name="android:windowIsFloating">true</item>
+        <item name="colorPrimary">@color/tamnoPlava</item>
+        <item name="colorPrimaryDark">@color/svijetloPlava</item>
+        <item name="colorAccent">@color/svijetloPlava</item>
+    </style>
 </resources>
