@@ -1,9 +1,7 @@
 package com.example.dnd;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.app.NotificationManager;
 import android.app.TimePickerDialog;
@@ -20,15 +18,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class Main extends AppCompatActivity {
@@ -38,10 +36,7 @@ public class Main extends AppCompatActivity {
     ImageButton add;
     float startHour, startMinute, endHour, endMinute;
     final Calendar c = Calendar.getInstance();
-
-    private static final String FILE_NAME = "DND.txt";
-
-
+    private static final String FILENAME = "dnd.txt";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,56 +48,50 @@ public class Main extends AppCompatActivity {
         repeating = findViewById(R.id.repeating);
         add = findViewById(R.id.add);
 
-
-        Load();
-
+        startTimeTextView.setText(Load().get(0).toString());
+        endTimeTextView.setText(Load().get(1).toString());
     }
 
-    public void Save() {
+    public void Save(TextView startTimeTextView, TextView endTimeTextView) {
         String[] time = {startTimeTextView.getText().toString(), endTimeTextView.getText().toString()};
         FileOutputStream fileOutputStream = null;
-
         try {
-            fileOutputStream = openFileOutput(FILE_NAME, MODE_PRIVATE);
-            fileOutputStream.write(time[0].getBytes());
-            fileOutputStream.write(time[1].getBytes());
+            fileOutputStream = openFileOutput(FILENAME, MODE_PRIVATE);
 
-            Toast.makeText(this, "saved", Toast.LENGTH_SHORT).show();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } finally {
-            if(fileOutputStream != null) {
-                try {
-                    fileOutputStream.close();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            for (String string: time) {
+                fileOutputStream.write(string.getBytes());
+                fileOutputStream.write("\n".getBytes());
             }
-        }
-    }
 
-    public void Load() {
+            fileOutputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            }
+    }
+    public List Load() {
         FileInputStream fileInputStream = null;
         try {
-            fileInputStream = openFileInput(FILE_NAME);
+            fileInputStream = openFileInput(FILENAME);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             StringBuilder stringBuilder = new StringBuilder();
-            String Time;
+            String line = bufferedReader.readLine();
 
-            while((Time = bufferedReader.readLine()) != null) {
-                stringBuilder.append(Time).append("\n");
+            List<String> TimeList = new ArrayList<String>();
+
+            while (line != null) {
+                TimeList.add(line);
+                line = bufferedReader.readLine();
             }
 
-            startTimeTextView.setText(stringBuilder.toString());
+            return TimeList;
+
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            if(fileInputStream != null) {
+            if (fileInputStream != null) {
                 try {
                     fileInputStream.close();
                 } catch (IOException e) {
@@ -111,7 +100,6 @@ public class Main extends AppCompatActivity {
             }
         }
     }
-
     public void setOnOff(View view) {
         if(onOff.isChecked()) {
             Mute();
@@ -136,7 +124,7 @@ public class Main extends AppCompatActivity {
                 startMinute = selectedMinute;
                 startTimeTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", (int) startHour, (int) startMinute));
 
-                Save();
+                Save(startTimeTextView, endTimeTextView);
                 Usporedi();
             }
         };
@@ -155,7 +143,7 @@ public class Main extends AppCompatActivity {
                 endMinute = selectedMinute;
                 endTimeTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", (int) endHour, (int) endMinute));
 
-                Save();
+                Save(startTimeTextView, endTimeTextView);
                 Usporedi();
             }
         };
