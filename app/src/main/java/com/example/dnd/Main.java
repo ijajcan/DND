@@ -12,6 +12,7 @@ import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Switch;
@@ -19,23 +20,25 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Main extends AppCompatActivity {
 
     Switch onOff, repeating;
     TextView startTimeTextView, endTimeTextView;
-    ImageButton add;
+    ImageButton addWiFI, addLocation;
     float startHour, startMinute, endHour, endMinute;
-    final Calendar c = Calendar.getInstance();
     private static final String FILENAME = "dnd.txt";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +49,19 @@ public class Main extends AppCompatActivity {
         startTimeTextView = findViewById(R.id.startTime);
         endTimeTextView = findViewById(R.id.endTime);
         repeating = findViewById(R.id.repeating);
-        add = findViewById(R.id.add);
+        addWiFI = findViewById(R.id.addWiFi);
+        addLocation = findViewById(R.id.addLocation);
+
+
+        Timer timer = new Timer();
+
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                LocalDateTime now = LocalDateTime.now();
+                Usporedi(now);
+                Log.v("jajcan", String.valueOf(now));
+            }
+        }, 0, 1000);
 
         startTimeTextView.setText(Load().get(0).toString());
         endTimeTextView.setText(Load().get(1).toString());
@@ -69,21 +84,33 @@ public class Main extends AppCompatActivity {
             }
     }
     public List Load() {
+        File file = new File("/data/data/com.example.dnd/files/dnd.txt");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = openFileInput(FILENAME);
             InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder stringBuilder = new StringBuilder();
             String line = bufferedReader.readLine();
 
             List<String> TimeList = new ArrayList<String>();
+
 
             while (line != null) {
                 TimeList.add(line);
                 line = bufferedReader.readLine();
             }
 
+            if(TimeList.isEmpty()) {
+                TimeList.add("00:00");
+                TimeList.add("00:00");
+            }
             return TimeList;
 
         } catch (FileNotFoundException e) {
@@ -105,7 +132,7 @@ public class Main extends AppCompatActivity {
             Mute();
         }
         else {
-            AnMute();
+            UnMute();
         }
     }
     public void setRepeating(View view) {
@@ -125,7 +152,7 @@ public class Main extends AppCompatActivity {
                 startTimeTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", (int) startHour, (int) startMinute));
 
                 Save(startTimeTextView, endTimeTextView);
-                Usporedi();
+                Usporedi(LocalDateTime.now());
             }
         };
 
@@ -144,7 +171,7 @@ public class Main extends AppCompatActivity {
                 endTimeTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", (int) endHour, (int) endMinute));
 
                 Save(startTimeTextView, endTimeTextView);
-                Usporedi();
+                Usporedi(LocalDateTime.now());
             }
         };
 
@@ -174,7 +201,7 @@ public class Main extends AppCompatActivity {
             mode.setRingerMode(AudioManager.RINGER_MODE_SILENT);
         }
     }
-    public void AnMute() {
+    public void UnMute() {
         if (ContextCompat.checkSelfPermission(Main.this, Manifest.permission.MODIFY_AUDIO_SETTINGS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(Main.this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS},101);
         }
@@ -197,19 +224,22 @@ public class Main extends AppCompatActivity {
             mode.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         }
     }
-    public void Usporedi() {
-        float hour = c.get(Calendar.HOUR_OF_DAY);
-        float minute = c.get(Calendar.MINUTE);
+    public void Usporedi(LocalDateTime now) {
+        float hour = now.getHour();
+        float minute = now.getMinute();
 
         float startTime = startHour + (startMinute / 60);
         float endTime = endHour + (endMinute / 60);
         float time = hour + (minute / 60);
 
-        if(time >= startTime && time <= endTime) {
+        if(time >= startTime && time < endTime) {
+            Log.v("jajcan", "mute");
             this.Mute();
         }
         else {
-            this.AnMute();
+            Log.v("jajcan", "unmute");
+
+            this.UnMute();
         }
     }
 
