@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/popUp"
+        android:layout_width="280dp"
+        android:layout_height="400dp"
+        android:backgroundTint="@color/svijetloSiva"
+        android:elevation="4dp"
+        app:cardCornerRadius="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:background="@drawable/ic_rounded_7_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="146dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="7.5dp"
+                    android:gravity="center_vertical"
+                    android:text="Monday"
+                    android:textColor="@color/tamnoPlava" />
+
+                <ImageButton
+                    android:onClick="SetDay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="64dp"
+                    android:src="@drawable/ic_day_button"
+                    android:id="@+id/buttonMonday"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/ic_rounded_7_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="146dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="7.5dp"
+                    android:gravity="center_vertical"
+                    android:text="Tuesday"
+                    android:textColor="@color/tamnoPlava" />
+
+                <ImageButton
+                    android:onClick="SetDay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="64dp"
+                    android:src="@drawable/ic_day_button"
+                    android:id="@+id/buttonTuesday"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/ic_rounded_7_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="146dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="7.5dp"
+                    android:gravity="center_vertical"
+                    android:text="Wednesday"
+                    android:textColor="@color/tamnoPlava" />
+
+                <ImageButton
+                    android:onClick="SetDay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="64dp"
+                    android:src="@drawable/ic_day_button"
+                    android:id="@+id/buttonWednesday"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/ic_rounded_7_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="146dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="7.5dp"
+                    android:gravity="center_vertical"
+                    android:text="Thursday"
+                    android:textColor="@color/tamnoPlava" />
+
+                <ImageButton
+                    android:onClick="SetDay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="64dp"
+                    android:src="@drawable/ic_day_button"
+                    android:id="@+id/buttonThursday"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/ic_rounded_7_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="146dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="7.5dp"
+                    android:gravity="center_vertical"
+                    android:text="Friday"
+                    android:textColor="@color/tamnoPlava" />
+
+                <ImageButton
+                    android:onClick="SetDay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="64dp"
+                    android:src="@drawable/ic_day_button"
+                    android:id="@+id/buttonFriday"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/ic_rounded_7_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="146dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="7.5dp"
+                    android:gravity="center_vertical"
+                    android:text="Saturday"
+                    android:textColor="@color/tamnoPlava" />
+
+                <ImageButton
+                    android:onClick="SetDay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="64dp"
+                    android:src="@drawable/ic_day_button"
+                    android:id="@+id/buttonSaturday"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/ic_rounded_7_5"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="146dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="7.5dp"
+                    android:gravity="center_vertical"
+                    android:text="Sunday"
+                    android:textColor="@color/tamnoPlava" />
+
+                <ImageButton
+                    android:onClick="SetDay"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="64dp"
+                    android:src="@drawable/ic_day_button"
+                    android:id="@+id/buttonSunday"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

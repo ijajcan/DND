@@ -3,12 +3,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
+import android.app.Application;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -40,10 +46,20 @@ public class Main extends AppCompatActivity {
     ImageButton addWiFI, addLocation;
     float startHour, startMinute, endHour, endMinute;
     private static final String FILENAME = "dnd.txt";
+    Dialog dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            public void run() {
+                LocalDateTime now = LocalDateTime.now();
+                Usporedi(now);
+            }
+        }, 0, 1000);
 
         onOff = findViewById(R.id.onOff);
         startTimeTextView = findViewById(R.id.startTime);
@@ -51,23 +67,65 @@ public class Main extends AppCompatActivity {
         repeating = findViewById(R.id.repeating);
         addWiFI = findViewById(R.id.addWiFi);
         addLocation = findViewById(R.id.addLocation);
-
-
-        Timer timer = new Timer();
-
-        timer.scheduleAtFixedRate(new TimerTask() {
-            public void run() {
-                LocalDateTime now = LocalDateTime.now();
-                Usporedi(now);
-                Log.v("jajcan", String.valueOf(now));
-            }
-        }, 0, 1000);
+        dialog = new Dialog(this);
 
         startTimeTextView.setText(Load().get(0).toString());
         endTimeTextView.setText(Load().get(1).toString());
+
+    }
+    public Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Network nw = connectivityManager.getActiveNetwork();
+            if (nw == null) return false;
+            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
+            return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+        } else {
+            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
+            return nwInfo != null && nwInfo.isConnected();
+        }
     }
 
-    public void Save(TextView startTimeTextView, TextView endTimeTextView) {
+    private void ShowPopup() {
+        dialog.setContentView(R.layout.popup_repeat);
+
+        ImageButton buttonMonday = dialog.findViewById(R.id.buttonMonday);
+        ImageButton buttonTuesday = dialog.findViewById(R.id.buttonTuesday);
+        ImageButton buttonWednesday = dialog.findViewById(R.id.buttonWednesday);
+        ImageButton buttonThursday = dialog.findViewById(R.id.buttonThursday);
+        ImageButton buttonFriday = dialog.findViewById(R.id.buttonFriday);
+        ImageButton buttonSaturday = dialog.findViewById(R.id.buttonSaturday);
+        ImageButton buttonSunday = dialog.findViewById(R.id.buttonSunday);
+
+        dialog.show();
+
+    }
+    public void SetDay(View view) {
+        switch (view.getId()) {
+            case 2131230821:
+                Log.v("jajcan", "1");
+                break;
+            case 2131230826:
+                Log.v("jajcan", "2");
+                break;
+            case 2131231237:
+                Log.v("jajcan", "3");
+                break;
+            case 2131230825:
+                Log.v("jajcan", "4");
+                break;
+            case 2131230820:
+                Log.v("jajcan", "5");
+                break;
+            case 2131230823:
+                Log.v("jajcan", "6");
+                break;
+            case 2131230824:
+                Log.v("jajcan", "7");
+                break;
+        }
+    }
+    private void Save(TextView startTimeTextView, TextView endTimeTextView) {
         String[] time = {startTimeTextView.getText().toString(), endTimeTextView.getText().toString()};
         FileOutputStream fileOutputStream = null;
         try {
@@ -83,7 +141,7 @@ public class Main extends AppCompatActivity {
             e.printStackTrace();
             }
     }
-    public List Load() {
+    private List Load() {
         File file = new File("/data/data/com.example.dnd/files/dnd.txt");
         if (!file.exists()) {
             try {
@@ -137,6 +195,7 @@ public class Main extends AppCompatActivity {
     }
     public void setRepeating(View view) {
         if(repeating.isChecked()) {
+            ShowPopup();
             Toast.makeText(getApplicationContext(), "On", Toast.LENGTH_SHORT).show();
         }
         else {
@@ -178,7 +237,7 @@ public class Main extends AppCompatActivity {
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, R.style.timePicker,onTimeSetListener, (int) endHour, (int) endMinute, true);
         timePickerDialog.show();
     }
-    public void Mute() {
+    private void Mute() {
         if (ContextCompat.checkSelfPermission(Main.this, Manifest.permission.MODIFY_AUDIO_SETTINGS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(Main.this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS},101);
         }
@@ -201,7 +260,7 @@ public class Main extends AppCompatActivity {
             mode.setRingerMode(AudioManager.RINGER_MODE_SILENT);
         }
     }
-    public void UnMute() {
+    private void UnMute() {
         if (ContextCompat.checkSelfPermission(Main.this, Manifest.permission.MODIFY_AUDIO_SETTINGS) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(Main.this, new String[]{Manifest.permission.MODIFY_AUDIO_SETTINGS},101);
         }
@@ -224,7 +283,7 @@ public class Main extends AppCompatActivity {
             mode.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         }
     }
-    public void Usporedi(LocalDateTime now) {
+    private void Usporedi(LocalDateTime now) {
         float hour = now.getHour();
         float minute = now.getMinute();
 
@@ -233,14 +292,10 @@ public class Main extends AppCompatActivity {
         float time = hour + (minute / 60);
 
         if(time >= startTime && time < endTime) {
-            Log.v("jajcan", "mute");
             this.Mute();
         }
         else {
-            Log.v("jajcan", "unmute");
-
             this.UnMute();
         }
     }
-
 }
