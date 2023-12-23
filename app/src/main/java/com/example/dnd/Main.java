@@ -3,7 +3,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.Manifest;
-import android.app.Application;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.TimePickerDialog;
@@ -15,6 +14,8 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -38,6 +39,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.net. InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Collections;
+import java.util. Enumeration;
 
 public class Main extends AppCompatActivity {
 
@@ -47,6 +53,8 @@ public class Main extends AppCompatActivity {
     float startHour, startMinute, endHour, endMinute;
     private static final String FILENAME = "dnd.txt";
     Dialog dialog;
+    String networkName = "\"AndroidWifi\"";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +62,17 @@ public class Main extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.schedule(new TimerTask() {
             public void run() {
                 LocalDateTime now = LocalDateTime.now();
-                Usporedi(now);
+                if(getNetworkName(Main.this).equals(networkName) || Usporedi(now)) {
+                    Log.v("jajcan", "true");
+                    Mute();
+                }
+                else {
+                    Log.v("jajcan", "unmute");
+                    UnMute();
+                }
             }
         }, 0, 1000);
 
@@ -71,20 +86,27 @@ public class Main extends AppCompatActivity {
 
         startTimeTextView.setText(Load().get(0).toString());
         endTimeTextView.setText(Load().get(1).toString());
+    }
 
-    }
-    public Boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            Network nw = connectivityManager.getActiveNetwork();
-            if (nw == null) return false;
-            NetworkCapabilities actNw = connectivityManager.getNetworkCapabilities(nw);
-            return actNw != null && (actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) || actNw.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH));
+    public String getNetworkName(Context context) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         } else {
-            NetworkInfo nwInfo = connectivityManager.getActiveNetworkInfo();
-            return nwInfo != null && nwInfo.isConnected();
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                Network network = cm.getActiveNetwork();
+                NetworkCapabilities nc = cm.getNetworkCapabilities(network);
+                if (nc != null && nc.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                    final WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+                    return wifiManager.getConnectionInfo().getSSID();
+                }
+            }
+            return "No network found";
         }
+        return "error";
     }
+
+
 
     private void ShowPopup() {
         dialog.setContentView(R.layout.popup_repeat);
@@ -211,7 +233,7 @@ public class Main extends AppCompatActivity {
                 startTimeTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", (int) startHour, (int) startMinute));
 
                 Save(startTimeTextView, endTimeTextView);
-                Usporedi(LocalDateTime.now());
+//                Usporedi(LocalDateTime.now());
             }
         };
 
@@ -230,7 +252,7 @@ public class Main extends AppCompatActivity {
                 endTimeTextView.setText(String.format(Locale.getDefault(), "%02d:%02d", (int) endHour, (int) endMinute));
 
                 Save(startTimeTextView, endTimeTextView);
-                Usporedi(LocalDateTime.now());
+//                Usporedi(LocalDateTime.now());
             }
         };
 
@@ -283,7 +305,7 @@ public class Main extends AppCompatActivity {
             mode.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
         }
     }
-    private void Usporedi(LocalDateTime now) {
+    private boolean Usporedi(LocalDateTime now) {
         float hour = now.getHour();
         float minute = now.getMinute();
 
@@ -292,10 +314,10 @@ public class Main extends AppCompatActivity {
         float time = hour + (minute / 60);
 
         if(time >= startTime && time < endTime) {
-            this.Mute();
+            return true;
         }
         else {
-            this.UnMute();
+            return false;
         }
     }
 }
